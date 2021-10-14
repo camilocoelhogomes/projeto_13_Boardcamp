@@ -11,5 +11,10 @@ const connection = new Pool({
 });
 
 const getCategories = connection.query('SELECT * from categories;');
+const postCategories = (name) => connection.query('INSERT INTO categories (name) VALUES ($1);', [name]);
 
-export { getCategories };
+
+export {
+    getCategories,
+    postCategories,
+};
