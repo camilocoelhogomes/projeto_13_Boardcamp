@@ -1,2 +1,9 @@
-import joi from 'joi';
+import Joi from 'joi';
 
+const categorieSchema = Joi.object({
+    name: Joi.string().required(),
+});
+
+export {
+    categorieSchema,
+}

@@ -4,6 +4,7 @@ import {
     getCategories,
     postCategories,
 } from './dataBaseFunctions.js';
+import { categorieSchema } from './validation.js';
 
 
 const app = express();
@@ -15,8 +16,12 @@ app.get("/categories", (req, res) => {
 });
 
 app.post('/categories', (req, res) => {
-    const { name } = req.body;
-    postCategories(name).then(() => res.status(201).send());
+    const { error, value } = categorieSchema.validate(req.body);
+    //const { name } = req.body
+    //  postCategories(name).then(() => res.status(201).send());
+    if (!!error) return res.send(400);
+
+    res.send({ error, value, })
 });
 
 app.listen(4000);
