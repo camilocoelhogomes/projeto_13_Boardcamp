@@ -2,12 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import {
     getCategories,
-    isCategorie,
+    exist,
     postCategories,
     getGames,
     postGames,
 } from './dataBaseFunctions.js';
-import { categorieSchema } from './validation.js';
+import { categorieSchema, gamesSchema } from './validation.js';
 
 
 const app = express();
@@ -22,7 +22,7 @@ app.post('/categories', (req, res) => {
     const { error } = categorieSchema.validate(req.body);
     if (!!error) return res.status(400).send();
     const { name } = req.body;
-    isCategorie(name).then(resDb =>
+    exist({ dataName: name, table: 'categories', collumn: 'name' }).then(resDb =>
         resDb.rows.length > 0 ?
             res.status(409).send() :
             postCategories(name).then(() => res.status(201).send())
@@ -34,7 +34,26 @@ app.get("/games", (req, res) => {
 });
 
 app.post('/games', (req, res) => {
-    postGames(req.body).then(res.status(201).send(req.body));
+    const { error } = gamesSchema.validate(req.body);
+    console.log(error);
+    if (!!error) return res.status(400).send();
+    const {
+        name,
+        categoryId,
+    } = req.body;
+    exist({ dataName: categoryId, table: 'categories', collumn: 'id' }).then(resDb =>
+        resDb.rows.length === 0 ?
+            res.status(400).send() :
+            exist({ dataName: name, table: 'games', collumn: 'name' }).then(resDb =>
+                resDb.rows.length > 0 ?
+                    res.status(409).send() :
+                    exist({ dataName: name, table: 'games', collumn: 'name' }).then(resDb =>
+                        resDb.rows.length > 0 ?
+                            res.status(409).send() :
+                            postGames(req.body).then(res.status(201).send())
+                    )
+            )
+    );
 })
 
 app.listen(4000);
