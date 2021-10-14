@@ -15,7 +15,7 @@ const getCategories = connection.query('SELECT * from categories;');
 const postCategories = (name) => connection.query('INSERT INTO categories (name) VALUES ($1);', [name]);
 
 const getGames = connection.query('SELECT * from games;');
-const searchGames = (name) => connection.query(`SELECT * from games WHERE name LIKE ($1);`, [name]);
+const searchGames = (name) => connection.query(`SELECT * from games WHERE LOWER(name) LIKE LOWER($1);`, [name]);
 
 const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => {
     return connection.query('INSERT INTO games (name,image,"stockTotal","categoryId","pricePerDay") VALUES ($1,$2,$3,$4,$5);', [name, image, stockTotal, categoryId, pricePerDay])
