@@ -10,6 +10,6 @@ const connection = new Pool({
     database: 'boardcamp'
 });
 
-const query = connection.query('SELECT * from categories;')
+const getCategories = connection.query('SELECT * from categories;');
 
-export { query };
+export { getCategories };
