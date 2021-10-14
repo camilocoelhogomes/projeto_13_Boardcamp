@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import {
     getCategories,
+    isCategorie,
     postCategories,
 } from './dataBaseFunctions.js';
 import { categorieSchema } from './validation.js';
@@ -16,12 +17,14 @@ app.get("/categories", (req, res) => {
 });
 
 app.post('/categories', (req, res) => {
-    const { error, value } = categorieSchema.validate(req.body);
-    //const { name } = req.body
-    //  postCategories(name).then(() => res.status(201).send());
-    if (!!error) return res.send(400);
-
-    res.send({ error, value, })
+    const { error } = categorieSchema.validate(req.body);
+    if (!!error) return res.status(400).send();
+    const { name } = req.body;
+    isCategorie(name).then(resDb =>
+        resDb.rows.length > 0 ?
+            res.status(409).send() :
+            postCategories(name).then(() => res.status(201).send())
+    );
 });
 
 app.listen(4000);
