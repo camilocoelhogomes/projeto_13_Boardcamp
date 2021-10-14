@@ -1,24 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import {
-    getCategories,
     exist,
     postCategories,
-    getGames,
     postGames,
     searchGames,
-    getCustomers,
     postCustomers,
+    getAll,
 } from './dataBaseFunctions.js';
 import { categorieSchema, gamesSchema } from './validation.js';
-
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.get("/categories", (req, res) => {
-    getCategories.then(resDb => res.status(200).send(resDb.rows))
+    getAll({ table: 'categories' }).then(resDb => res.status(200).send(resDb.rows))
 });
 
 app.post('/categories', (req, res) => {
@@ -37,7 +33,7 @@ app.get("/games", (req, res) => {
     if (!!name) {
         searchGames(name + '%').then(resDb => res.status(200).send(resDb.rows))
     } else {
-        getGames.then(resDb => res.status(200).send(resDb.rows));
+        getAll({ table: 'games' }).then(resDb => res.status(200).send(resDb.rows));
     }
 });
 
@@ -62,9 +58,9 @@ app.post('/games', (req, res) => {
 app.get('/customers', (req, res) => {
     const { cpf } = req.query;
     if (!!cpf) {
-        searchGames(cpf + '%').then(resDb => res.status(200).send(resDb.rows))
+        searchGames(cpf + '%').then(resDb => res.status(200).send(resDb.rows));
     } else {
-        getCustomers.then(resDb => res.status(200).send(resDb.rows));
+        getAll({ table: 'customers' }).then(resDb => res.status(200).send(resDb.rows));
     }
 })
 
