@@ -7,6 +7,7 @@ import {
     getGames,
     postGames,
     searchGames,
+    getCustomers,
 } from './dataBaseFunctions.js';
 import { categorieSchema, gamesSchema } from './validation.js';
 
@@ -33,7 +34,7 @@ app.post('/categories', (req, res) => {
 app.get("/games", (req, res) => {
     const { name } = req.query;
     if (!!name) {
-        searchGames(name + '%').then(resDb => res.status(201).send(resDb.rows))
+        searchGames(name + '%').then(resDb => res.status(200).send(resDb.rows))
     } else {
         getGames.then(resDb => res.status(200).send(resDb.rows));
     }
@@ -55,6 +56,15 @@ app.post('/games', (req, res) => {
                     postGames(req.body).then(res.status(201).send())
             )
     );
+})
+
+app.get('/customers', (req, res) => {
+    const { cpf } = req.query;
+    if (!!cpf) {
+        searchGames(cpf + '%').then(resDb => res.status(200).send(resDb.rows))
+    } else {
+        getCustomers.then(resDb => res.status(200).send(resDb.rows));
+    }
 })
 
 app.listen(4000);

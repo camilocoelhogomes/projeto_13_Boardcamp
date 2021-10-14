@@ -16,15 +16,17 @@ const postCategories = (name) => connection.query('INSERT INTO categories (name)
 
 const getGames = connection.query('SELECT * from games;');
 const searchGames = (name) => connection.query(`SELECT * from games WHERE LOWER(name) LIKE LOWER($1);`, [name]);
+const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => connection.query('INSERT INTO games (name,image,"stockTotal","categoryId","pricePerDay") VALUES ($1,$2,$3,$4,$5);', [name, image, stockTotal, categoryId, pricePerDay])
 
-const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => {
-    return connection.query('INSERT INTO games (name,image,"stockTotal","categoryId","pricePerDay") VALUES ($1,$2,$3,$4,$5);', [name, image, stockTotal, categoryId, pricePerDay])
-}
+
+const getCustomers = connection.query('SELECT * from customers;');
+
 export {
     getCategories,
     postCategories,
     exist,
     getGames,
     postGames,
-    searchGames
+    searchGames,
+    getCustomers,
 };
