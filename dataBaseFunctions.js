@@ -12,11 +12,17 @@ const connection = new Pool({
 
 const getCategories = connection.query('SELECT * from categories;');
 const postCategories = (name) => connection.query('INSERT INTO categories (name) VALUES ($1);', [name]);
-
 const isCategorie = (name) => connection.query('SELECT * from categories WHERE name = ($1);', [name])
 
+const getGames = connection.query('SELECT * from games;');
+const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => {
+    console.log(name, image, stockTotal, categoryId, pricePerDay);
+    return connection.query("INSERT INTO games (name,image,stockTotal,categoryId,pricePerDay) VALUES ($1,$2,$3,$4,$5);", [name, image, stockTotal, categoryId, pricePerDay])
+}
 export {
     getCategories,
     postCategories,
-    isCategorie
+    isCategorie,
+    getGames,
+    postGames,
 };

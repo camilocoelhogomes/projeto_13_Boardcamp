@@ -4,6 +4,8 @@ import {
     getCategories,
     isCategorie,
     postCategories,
+    getGames,
+    postGames,
 } from './dataBaseFunctions.js';
 import { categorieSchema } from './validation.js';
 
@@ -26,5 +28,13 @@ app.post('/categories', (req, res) => {
             postCategories(name).then(() => res.status(201).send())
     );
 });
+
+app.get("/games", (req, res) => {
+    getGames.then(resDb => res.status(200).send(resDb.rows));
+});
+
+app.post('/games', (req, res) => {
+    postGames(req.body).then(res.status(201).send(req.body));
+})
 
 app.listen(4000);
