@@ -20,6 +20,7 @@ const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => conn
 
 
 const getCustomers = connection.query('SELECT * from customers;');
+const postCustomers = ({ name, phone, cpf, birthday }) => connection.query('INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1,$2,$3,$4);', [name, phone, cpf, birthday])
 
 export {
     getCategories,
@@ -29,4 +30,5 @@ export {
     postGames,
     searchGames,
     getCustomers,
+    postCustomers,
 };

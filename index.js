@@ -8,6 +8,7 @@ import {
     postGames,
     searchGames,
     getCustomers,
+    postCustomers,
 } from './dataBaseFunctions.js';
 import { categorieSchema, gamesSchema } from './validation.js';
 
@@ -65,6 +66,10 @@ app.get('/customers', (req, res) => {
     } else {
         getCustomers.then(resDb => res.status(200).send(resDb.rows));
     }
+})
+
+app.post('/customers', (req, res) => {
+    postCustomers(req.body).then(resDb => res.status(201).send());
 })
 
 app.listen(4000);
