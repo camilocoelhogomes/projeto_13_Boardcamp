@@ -4,6 +4,7 @@ const categorieSchema = Joi.object({
     name: Joi.string().required(),
 });
 
+
 const gamesSchema = Joi.object({
     name: Joi.string().required(),
     stockTotal: Joi.number().greater(0).required(),
@@ -14,7 +15,15 @@ const gamesSchema = Joi.object({
     categoryId: Joi.number().required(),
 })
 
+const customerSchema = Joi.object({
+    name: Joi.string().required(),
+    phone: Joi.string(),
+    cpf: Joi.string().pattern(/^\d{11}$/),
+    birthday: Joi.date(),
+})
+
 export {
     categorieSchema,
     gamesSchema,
+    customerSchema,
 }

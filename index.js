@@ -8,7 +8,7 @@ import {
     postCustomers,
     getAllFromTable,
 } from './dataBaseFunctions.js';
-import { categorieSchema, gamesSchema } from './validation.js';
+import { categorieSchema, customerSchema, gamesSchema } from './validation.js';
 
 const app = express();
 app.use(cors());
@@ -72,7 +72,9 @@ app.get('/customers/:clientId', async (req, res) => {
 })
 
 app.post('/customers', (req, res) => {
-    postCustomers(req.body).then(() => res.status(201).send());
+    const { error } = customerSchema.validate(req.body);
+    if (!!error) return res.status(400).send(error);
+    res.status(201).send();
 })
 
 app.listen(4000);
