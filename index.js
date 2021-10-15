@@ -18,15 +18,14 @@ app.get("/categories", (req, res) => {
     getAllFromTable({ table: 'categories' }).then(resDb => res.status(200).send(resDb.rows))
 });
 
-app.post('/categories', (req, res) => {
+app.post('/categories', async (req, res) => {
     const { error } = categorieSchema.validate(req.body);
     if (!!error) return res.status(400).send();
     const { name } = req.body;
-    exist({ dataSearch: name, table: 'categories', collumn: 'name' }).then(resDb =>
-        resDb.rows.length > 0 ?
-            res.status(409).send() :
-            postCategories(name).then(() => res.status(201).send())
-    );
+    const isName = await exist({ dataSearch: name, table: 'categories', collumn: 'name' });
+    if (!!isName.rows.length) return res.status(409).send()
+    postCategories(name).then(() => res.status(201).send())
+
 });
 
 app.get("/games", (req, res) => {
@@ -71,9 +70,11 @@ app.get('/customers/:clientId', async (req, res) => {
     res.status(200).send(client.rows[0])
 })
 
-app.post('/customers', (req, res) => {
+app.post('/customers', async (req, res) => {
     const { error } = customerSchema.validate(req.body);
     if (!!error) return res.status(400).send(error);
+    const isCpf = await exist({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf' });
+    if (!!isCpf.rows.length) return res.status(409).send();
     res.status(201).send();
 })
 

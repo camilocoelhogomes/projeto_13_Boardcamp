@@ -1,4 +1,6 @@
-import Joi from 'joi';
+import Joi from 'joi'
+import joi from '@joi/date'
+const extendedJoi = Joi.extend(joi)
 
 const categorieSchema = Joi.object({
     name: Joi.string().required(),
@@ -19,7 +21,7 @@ const customerSchema = Joi.object({
     name: Joi.string().required(),
     phone: Joi.string(),
     cpf: Joi.string().pattern(/^\d{11}$/),
-    birthday: Joi.date(),
+    birthday: extendedJoi.date().format('YYYY-MM-DD').utc(),
 })
 
 export {
