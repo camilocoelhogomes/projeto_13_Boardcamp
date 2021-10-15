@@ -17,12 +17,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/categories", (req, res) => {
-    try {
-        getAllFromTable({ table: 'categories' }).then(resDb => res.status(200).send(resDb.rows))
-    }
-    catch (error) {
-        res.status(500).send()
-    }
+    getAllFromTable({ table: 'categories' })
+        .then(resDb => res.status(200).send(resDb.rows))
+        .catch(() => res.status(500).send())
 });
 
 app.post('/categories', async (req, res) => {
@@ -34,7 +31,9 @@ app.post('/categories', async (req, res) => {
         const isName = await exist({ dataSearch: name, table: 'categories', collumn: 'name' });
         if (!!isName.rows.length) return res.status(409).send()
 
-        postCategories(name).then(() => res.status(201).send())
+        await postCategories(name);
+        res.status(201).send();
+
     } catch (error) {
         res.status(500).send()
     }
@@ -43,14 +42,14 @@ app.post('/categories', async (req, res) => {
 
 app.get("/games", (req, res) => {
     const { name } = req.query;
-    try {
-        if (!!name) {
-            searchFromTable({ dataSearch: name, table: 'games', collumn: 'name' }).then(resDb => res.status(200).send(resDb.rows))
-        } else {
-            getAllFromTable({ table: 'games' }).then(resDb => res.status(200).send(resDb.rows));
-        }
-    } catch (error) {
-        res.status(500).send()
+    if (!!name) {
+        searchFromTable({ dataSearch: name, table: 'games', collumn: 'name' })
+            .then(resDb => res.status(200).send(resDb.rows))
+            .catch(() => res.status(500).send())
+    } else {
+        getAllFromTable({ table: 'games' })
+            .then(resDb => res.status(200).send(resDb.rows))
+            .catch(() => res.status(500).send())
     }
 });
 
@@ -68,7 +67,8 @@ app.post('/games', async (req, res) => {
         const isGame = await exist({ dataSearch: name, table: 'games', collumn: 'name' });
         if (!!isGame.rows.length) return res.status(409).send();
 
-        postGames(req.body).then(res.status(201).send())
+        await postGames(req.body)
+        res.status(201).send();
     } catch (error) {
         res.status(500).send()
     }
@@ -76,16 +76,14 @@ app.post('/games', async (req, res) => {
 
 app.get('/customers', (req, res) => {
     const { cpf } = req.query;
-    try {
-        if (!!cpf) {
-            searchFromTable({ dataSearch: cpf, table: 'customers', collumn: 'cpf' })
-                .then(resDb => res.status(200).send(resDb.rows));
-        } else {
-            getAllFromTable({ table: 'customers' })
-                .then(resDb => res.status(200).send(resDb.rows));
-        }
-    } catch (error) {
-        res.status(500).send();
+    if (!!cpf) {
+        searchFromTable({ dataSearch: cpf, table: 'customers', collumn: 'cpf' })
+            .then(resDb => res.status(200).send(resDb.rows))
+            .catch(() => res.status(500).send())
+    } else {
+        getAllFromTable({ table: 'customers' })
+            .then(resDb => res.status(200).send(resDb.rows))
+            .catch(() => res.status(500).send())
     }
 })
 
@@ -107,7 +105,9 @@ app.post('/customers', async (req, res) => {
         const isCpf = await exist({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf' });
         if (!!isCpf.rows.length) return res.status(409).send();
 
-        postCustomers(req.body).then(() => res.status(201).send())
+        await postCustomers(req.body)
+        res.status(201).send();
+
     } catch (error) {
         res.status(500).send();
     }
@@ -125,7 +125,8 @@ app.put('/customers/:customerId', async (req, res) => {
         const isCpf = await existWhenEditing({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf', customerId: customerId });
         if (!!isCpf.rows.length) return res.status(409).send();
 
-        putCustomers({ ...req.body, customerId: customerId }).then(() => res.status(201).send())
+        await putCustomers({ ...req.body, customerId: customerId })
+        res.status(201).send();
     } catch (error) {
         res.status(500).send();
     }
