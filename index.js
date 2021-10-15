@@ -23,9 +23,11 @@ app.get("/categories", (req, res) => {
 app.post('/categories', async (req, res) => {
     const { error } = categorieSchema.validate(req.body);
     if (!!error) return res.status(400).send();
+
     const { name } = req.body;
     const isName = await exist({ dataSearch: name, table: 'categories', collumn: 'name' });
     if (!!isName.rows.length) return res.status(409).send()
+
     postCategories(name).then(() => res.status(201).send())
 
 });
@@ -59,9 +61,11 @@ app.post('/games', async (req, res) => {
 app.get('/customers', (req, res) => {
     const { cpf } = req.query;
     if (!!cpf) {
-        searchFromTable({ dataSearch: cpf, table: 'customers', collumn: 'cpf' }).then(resDb => res.status(200).send(resDb.rows));
+        searchFromTable({ dataSearch: cpf, table: 'customers', collumn: 'cpf' })
+            .then(resDb => res.status(200).send(resDb.rows));
     } else {
-        getAllFromTable({ table: 'customers' }).then(resDb => res.status(200).send(resDb.rows));
+        getAllFromTable({ table: 'customers' })
+            .then(resDb => res.status(200).send(resDb.rows));
     }
 })
 
@@ -75,8 +79,10 @@ app.get('/customers/:customerId', async (req, res) => {
 app.post('/customers', async (req, res) => {
     const { error } = customerSchema.validate(req.body);
     if (!!error) return res.status(400).send(error);
+
     const isCpf = await exist({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf' });
     if (!!isCpf.rows.length) return res.status(409).send();
+
     postCustomers(req.body).then(() => res.status(201).send())
 })
 
