@@ -6,15 +6,16 @@ import {
     postGames,
     searchGames,
     postCustomers,
-    getAll,
+    getAllFromTable,
 } from './dataBaseFunctions.js';
 import { categorieSchema, gamesSchema } from './validation.js';
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.get("/categories", (req, res) => {
-    getAll({ table: 'categories' }).then(resDb => res.status(200).send(resDb.rows))
+    getAllFromTable({ table: 'categories' }).then(resDb => res.status(200).send(resDb.rows))
 });
 
 app.post('/categories', (req, res) => {
@@ -33,7 +34,7 @@ app.get("/games", (req, res) => {
     if (!!name) {
         searchGames(name + '%').then(resDb => res.status(200).send(resDb.rows))
     } else {
-        getAll({ table: 'games' }).then(resDb => res.status(200).send(resDb.rows));
+        getAllFromTable({ table: 'games' }).then(resDb => res.status(200).send(resDb.rows));
     }
 });
 
@@ -60,7 +61,7 @@ app.get('/customers', (req, res) => {
     if (!!cpf) {
         searchGames(cpf + '%').then(resDb => res.status(200).send(resDb.rows));
     } else {
-        getAll({ table: 'customers' }).then(resDb => res.status(200).send(resDb.rows));
+        getAllFromTable({ table: 'customers' }).then(resDb => res.status(200).send(resDb.rows));
     }
 })
 
