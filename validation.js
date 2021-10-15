@@ -20,7 +20,7 @@ const gamesSchema = Joi.object({
 const customerSchema = Joi.object({
     name: Joi.string().required(),
     phone: Joi.string(),
-    cpf: Joi.string().pattern(/^\d{11}$/),
+    cpf: Joi.string().pattern(/^\d{11}$/).required(),
     birthday: extendedJoi.date().format('YYYY-MM-DD').utc(),
 })
 

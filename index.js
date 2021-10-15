@@ -7,6 +7,8 @@ import {
     searchFromTable,
     postCustomers,
     getAllFromTable,
+    existWhenEditing,
+    putCustomers,
 } from './dataBaseFunctions.js';
 import { categorieSchema, customerSchema, gamesSchema } from './validation.js';
 
@@ -63,9 +65,9 @@ app.get('/customers', (req, res) => {
     }
 })
 
-app.get('/customers/:clientId', async (req, res) => {
-    const { clientId } = req.params;
-    const client = await exist({ dataSearch: clientId, table: 'customers', collumn: 'id' });
+app.get('/customers/:customerId', async (req, res) => {
+    const { customerId } = req.params;
+    const client = await exist({ dataSearch: customerId, table: 'customers', collumn: 'id' });
     if (!client.rows.length) return res.status(404).send();
     res.status(200).send(client.rows[0])
 })
@@ -75,7 +77,21 @@ app.post('/customers', async (req, res) => {
     if (!!error) return res.status(400).send(error);
     const isCpf = await exist({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf' });
     if (!!isCpf.rows.length) return res.status(409).send();
-    res.status(201).send();
+    postCustomers(req.body).then(() => res.status(201).send())
+})
+
+app.put('/customers/:customerId', async (req, res) => {
+    const { customerId } = req.params;
+    const client = await exist({ dataSearch: customerId, table: 'customers', collumn: 'id' });
+    if (!client.rows.length) return res.status(404).send();
+
+    const { error } = customerSchema.validate(req.body);
+    if (!!error) return res.status(400).send(error);
+
+    const isCpf = await existWhenEditing({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf', customerId: customerId });
+    if (!!isCpf.rows.length) return res.status(409).send();
+
+    putCustomers({ ...req.body, customerId: customerId }).then(() => res.status(201).send())
 })
 
 app.listen(4000);

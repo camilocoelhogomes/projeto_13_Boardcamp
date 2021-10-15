@@ -16,6 +16,8 @@ const searchFromTable = ({ dataSearch, table, collumn }) => connection.query(`SE
 const postCategories = (name) => connection.query('INSERT INTO categories (name) VALUES ($1);', [name]);
 const postGames = ({ name, image, stockTotal, categoryId, pricePerDay }) => connection.query('INSERT INTO games (name,image,"stockTotal","categoryId","pricePerDay") VALUES ($1,$2,$3,$4,$5);', [name, image, stockTotal, categoryId, pricePerDay]);
 const postCustomers = ({ name, phone, cpf, birthday }) => connection.query('INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1,$2,$3,$4);', [name, phone, cpf, birthday]);
+const putCustomers = ({ name, phone, cpf, birthday, customerId }) => connection.query('UPDATE customers SET name=($2), phone=($3), cpf=($4), birthday=($5) WHERE id=($1);', [customerId, name, phone, cpf, birthday]);
+const existWhenEditing = ({ dataSearch, table, collumn, customerId }) => connection.query(`SELECT * from "${table}" WHERE ("${collumn}" = ($1) AND id <> ($2));`, [dataSearch, customerId]);
 
 export {
     postCategories,
@@ -24,4 +26,6 @@ export {
     searchFromTable,
     postCustomers,
     getAllFromTable,
+    putCustomers,
+    existWhenEditing
 };
