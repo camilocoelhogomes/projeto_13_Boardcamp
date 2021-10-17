@@ -9,8 +9,9 @@ import {
     getAllFromTable,
     existWhenEditing,
     putCustomers,
+    postRental,
 } from './dataBaseFunctions.js';
-import { categorieSchema, customerSchema, gamesSchema } from './validation.js';
+import { categorieSchema, customerSchema, gamesSchema, rentalSchema } from './validation.js';
 
 const app = express();
 app.use(cors());
@@ -60,6 +61,7 @@ app.post('/games', async (req, res) => {
         name,
         categoryId,
     } = req.body;
+
     try {
         const isCategorie = await exist({ dataSearch: categoryId, table: 'categories', collumn: 'id' });
         if (!isCategorie.rows.length) return res.status(400).send();
@@ -129,6 +131,43 @@ app.put('/customers/:customerId', async (req, res) => {
         res.status(201).send();
     } catch (error) {
         res.status(500).send();
+    }
+})
+
+app.post('/rentals', async (req, res) => {
+
+    const { error } = rentalSchema.validate(req.body);
+    if (!!error) return res.status(400).send();
+
+    try {
+        const customer = await exist({ dataSearch: req.body.customerId, table: 'customers', collumn: 'id' });
+        const game = await exist({ dataSearch: req.body.gameId, table: 'games', collumn: 'id' });
+
+        if (!customer.rows.length || !game.rows.length) return res.status(400).send();
+
+        const rent = {
+            ...req.body,
+            rentDate: new Date(),
+            returnDate: null,
+            delayFee: null,
+            originalPrice: game.rows[0].pricePerDay * req.body.daysRented,
+        }
+        await postRental(rent);
+        res.status(201).send(rent);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+
+})
+
+app.post('/rentals/:rentalId/return', async (req, res) => {
+    const { rentalId } = req.params;
+    try {
+        const isRental = await exist({ dataSearch: rentalId, table: 'rentals', collumn: 'id' });
+        if (!isRental.rows.length) return res.status(404).send();
+        res.status(200).send(rentalId);
+    } catch (error) {
+        res.status(500).send(error);
     }
 })
 

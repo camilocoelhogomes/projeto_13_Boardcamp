@@ -24,8 +24,15 @@ const customerSchema = Joi.object({
     birthday: extendedJoi.date().format('YYYY-MM-DD').utc(),
 })
 
+const rentalSchema = Joi.object({
+    customerId: Joi.number().required(),
+    gameId: Joi.number().required(),
+    daysRented: Joi.number().required().integer().greater(0),
+});
+
 export {
     categorieSchema,
     gamesSchema,
     customerSchema,
+    rentalSchema,
 }
