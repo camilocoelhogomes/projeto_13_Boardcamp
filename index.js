@@ -145,7 +145,9 @@ app.post('/rentals', async (req, res) => {
     try {
         const customer = await exist({ dataSearch: req.body.customerId, table: 'customers', collumn: 'id' });
         const game = await exist({ dataSearch: req.body.gameId, table: 'games', collumn: 'id' });
-
+        const rents = await getRentals();
+        const gameRentedNow = rents.rows.filter(rent => !rent.returnDate && rent.gameId === req.body.gameId);
+        if (game.rows[0].stockTotal <= gameRentedNow.length) return res.status(400).send({ stock: game.rows[0].stockTotal, rent: gameRentedNow.length });
         if (!customer.rows.length || !game.rows.length) return res.status(400).send();
 
         const rent = {
@@ -156,10 +158,12 @@ app.post('/rentals', async (req, res) => {
             originalPrice: game.rows[0].pricePerDay * req.body.daysRented,
         }
         await postRental(rent);
-        res.status(201).send(rent);
+        res.status(201).send({ stock: game.rows[0].stockTotal, rent: gameRentedNow.length });
+
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).send(error)
     }
+
 
 })
 
