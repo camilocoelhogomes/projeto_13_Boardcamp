@@ -45,6 +45,7 @@ const getRentals = () => connection.query(`
     ON
         categories.id = games."categoryId";
 `)
+
 export {
     postCategories,
     exist,
@@ -57,5 +58,7 @@ export {
     postRental,
     returnRental,
     deleteRental,
-    getRentals
+    getRentals,
+
+
 };

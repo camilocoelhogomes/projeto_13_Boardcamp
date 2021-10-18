@@ -12,7 +12,7 @@ import {
     postRental,
     returnRental,
     deleteRental,
-    getRentals
+    getRentals,
 } from './dataBaseFunctions.js';
 import { categorieSchema, customerSchema, gamesSchema, rentalSchema } from './validation.js';
 
@@ -197,9 +197,11 @@ app.delete("/rentals/:rentalId", async (req, res) => {
 })
 
 app.get('/rentals', async (req, res) => {
+    const { customerId, gameId } = req.query;
     try {
-        const rentals = await getRentals();
-        const rentalsToSend = rentals.rows.map(
+        let rentals = await getRentals();
+        rentals = rentals.rows;
+        const rentalsToSend = rentals.map(
             rental => {
                 return {
                     id: rental.id,
@@ -222,9 +224,18 @@ app.get('/rentals', async (req, res) => {
                     }
                 }
             }
-        )
-        res.send(rentalsToSend);
-    } catch {
+        ).filter(rental => {
+            if (!!customerId && !!gameId) {
+                return rental.customerId === Number(customerId) && rental.gameId === Number(gameId)
+            } else if (!!customerId) {
+                return rental.customerId === Number(customerId)
+            } else if (!!gameId) {
+                return rental.gameId === Number(gameId)
+            } else return true
+        })
+
+        res.status(200).send(rentalsToSend);
+    } catch (error) {
         res.status(500).send(error);
     }
 })
