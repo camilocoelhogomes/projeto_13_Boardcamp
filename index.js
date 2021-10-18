@@ -105,7 +105,7 @@ app.get('/customers/:customerId', async (req, res) => {
 
 app.post('/customers', async (req, res) => {
     const { error } = customerSchema.validate(req.body);
-    if (!!error) return res.status(400).send(error);
+    if (!!error) return res.status(400).send();
     try {
         const isCpf = await exist({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf' });
         if (!!isCpf.rows.length) return res.status(409).send();
@@ -125,7 +125,7 @@ app.put('/customers/:customerId', async (req, res) => {
         if (!client.rows.length) return res.status(404).send();
 
         const { error } = customerSchema.validate(req.body);
-        if (!!error) return res.status(400).send(error);
+        if (!!error) return res.status(400).send();
 
         const isCpf = await existWhenEditing({ dataSearch: req.body.cpf, table: 'customers', collumn: 'cpf', customerId: customerId });
         if (!!isCpf.rows.length) return res.status(409).send();
@@ -147,7 +147,7 @@ app.post('/rentals', async (req, res) => {
         const game = await exist({ dataSearch: req.body.gameId, table: 'games', collumn: 'id' });
         const rents = await getRentals();
         const gameRentedNow = rents.rows.filter(rent => !rent.returnDate && rent.gameId === req.body.gameId);
-        if (game.rows[0].stockTotal <= gameRentedNow.length) return res.status(400).send({ stock: game.rows[0].stockTotal, rent: gameRentedNow.length });
+        if (game.rows[0].stockTotal <= gameRentedNow.length) return res.status(400).send();
         if (!customer.rows.length || !game.rows.length) return res.status(400).send();
 
         const rent = {
@@ -158,7 +158,7 @@ app.post('/rentals', async (req, res) => {
             originalPrice: game.rows[0].pricePerDay * req.body.daysRented,
         }
         await postRental(rent);
-        res.status(201).send({ stock: game.rows[0].stockTotal, rent: gameRentedNow.length });
+        res.status(201).send();
 
     } catch (error) {
         res.status(500).send(error)
