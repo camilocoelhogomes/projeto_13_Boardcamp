@@ -11,7 +11,8 @@ import {
     putCustomers,
     postRental,
     returnRental,
-    deleteRental
+    deleteRental,
+    getRentals
 } from './dataBaseFunctions.js';
 import { categorieSchema, customerSchema, gamesSchema, rentalSchema } from './validation.js';
 
@@ -191,6 +192,39 @@ app.delete("/rentals/:rentalId", async (req, res) => {
         await deleteRental({ rentalId });
         res.sendStatus(200);
     } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+app.get('/rentals', async (req, res) => {
+    try {
+        const rentals = await getRentals();
+        const rentalsToSend = rentals.rows.map(
+            rental => {
+                return {
+                    id: rental.id,
+                    customerId: rental.customerId,
+                    gameId: rental.gameId,
+                    rentDate: rental.rentDate,
+                    daysRented: rental.daysRented,
+                    returnDate: rental.returnDate,
+                    originalPrice: rental.originalPrice,
+                    delayFee: rental.delayFee,
+                    customer: {
+                        id: rental.customers_id,
+                        name: rental.customers_name,
+                    },
+                    game: {
+                        id: rental.games_id,
+                        name: rental.games_name,
+                        categoryId: rental.games_category_id,
+                        categoryName: rental.game_gategories_name,
+                    }
+                }
+            }
+        )
+        res.send(rentalsToSend);
+    } catch {
         res.status(500).send(error);
     }
 })

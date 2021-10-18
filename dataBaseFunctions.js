@@ -21,7 +21,30 @@ const existWhenEditing = ({ dataSearch, table, collumn, customerId }) => connect
 const postRental = ({ customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee }) => connection.query('INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented","returnDate","originalPrice","delayFee" ) VALUES ($1,$2,$3,$4,$5,$6,$7);', [customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee]);
 const returnRental = ({ returnDate, delayFee, rentalId }) => connection.query('UPDATE rentals SET "returnDate"=($2), "delayFee"=($3) WHERE id=($1);', [rentalId, returnDate, delayFee]);
 const deleteRental = ({ rentalId }) => connection.query('DELETE from rentals WHERE id = ($1)', [rentalId]);
-
+const getRentals = () => connection.query(`
+    SELECT 
+        rentals.*,
+        customers.id AS customers_id,
+        customers.name AS customers_name,
+        games.id AS games_id,
+        games.name AS games_name,
+        games."categoryId" AS games_category_id,
+        categories.name AS game_gategories_name
+    FROM 
+        rentals
+    JOIN 
+        customers 
+    ON
+        rentals."customerId" = customers.id
+    JOIN
+        games
+    ON
+        rentals."gameId" = games.id
+    JOIN
+        categories
+    ON
+        categories.id = games."categoryId";
+`)
 export {
     postCategories,
     exist,
@@ -33,5 +56,6 @@ export {
     existWhenEditing,
     postRental,
     returnRental,
-    deleteRental
+    deleteRental,
+    getRentals
 };
