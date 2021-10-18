@@ -10,6 +10,8 @@ import {
     existWhenEditing,
     putCustomers,
     postRental,
+    returnRental,
+    deleteRental
 } from './dataBaseFunctions.js';
 import { categorieSchema, customerSchema, gamesSchema, rentalSchema } from './validation.js';
 
@@ -165,7 +167,29 @@ app.post('/rentals/:rentalId/return', async (req, res) => {
     try {
         const isRental = await exist({ dataSearch: rentalId, table: 'rentals', collumn: 'id' });
         if (!isRental.rows.length) return res.status(404).send();
-        res.status(200).send(rentalId);
+        if (!isRental.rows[0].returnDate) return res.sendStatus(400);
+        const returnDate = new Date();
+        const { rentDate, daysRented, originalPrice } = isRental.rows[0];
+        const realDaysRented = Math.floor(Math.abs(returnDate - rentDate) / (8.64 * (10 ** 7)));
+        let delayFee = 0;
+        if (realDaysRented > daysRented) {
+            delayFee = (realDaysRented - daysRented) * (originalPrice / daysRented);
+        }
+        await returnRental({ rentalId, returnDate, delayFee });
+        res.sendStatus(200);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+app.delete("/rentals/:rentalId", async (req, res) => {
+    const { rentalId } = req.params;
+    try {
+        const isRental = await exist({ dataSearch: rentalId, table: 'rentals', collumn: 'id' });
+        if (!isRental.rows.length) return res.status(404).send();
+        if (!!isRental.rows[0].returnDate) return res.status(400).send();
+        await deleteRental({ rentalId });
+        res.sendStatus(200);
     } catch (error) {
         res.status(500).send(error);
     }
